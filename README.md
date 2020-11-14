@@ -6,6 +6,10 @@ The poeject also contains a little demo.
 
 ![Example of the demo output](https://github.com/ilyanikolaevsky/navmesh/blob/master/picture.png?raw=true)
 
+
+The main feature of this library is it's speed: for a moderate amount (100) of quite big polygons (20 points each) the library computes
+everything in 7-8ms on a i7-6700k CPU. It doesn't require baking in the graph around the geometry, which allows compeletely dynamic geometry of the map.
+
 ## Usage
 
 You need to include ``path_finder.h``, ``point.h``, ``segment.h``, ``polygon.h`` files in your project and link against the static library.
@@ -28,8 +32,9 @@ This method takes ``O((n*k+p)*n*log(n*k+p))`` time and uses ``O((n+p)*n)`` memor
 ## Details
 
 This project constructs the graph around obstacles, using polygon sides and tangents to polygons as edges in the graph. 
-Then it uses A* on the constructed graph to find the shortest path. This implementation takes 10ms to construct the graph with 100 polygons with upto 20 points each on i7-6700k CPU. 
-The path calulations on the graph take less than 1ms. Already computed tangents are reused to check for intersections of potential edges and obstacles.
+Then it uses A* on the constructed graph to find the shortest path. This implementation takes 8ms to construct the graph with 100 polygons with upto 20 points each on i7-6700k CPU. 
+The path calulations on the graph take negligibaly small amout of time - most computations are spent on constructing the graph.
+Already computed tangents are reused to check for intersections of potential edges and obstacles in O(1). A fast logarithmic method is used for checking if points are inside an obstacle and for tangents construction.
 
 ## Code structure
 ``source/`` directory contains the library, ``tests/`` directory contains tests and ``demo/`` directory contains a simple Windows demo application.
