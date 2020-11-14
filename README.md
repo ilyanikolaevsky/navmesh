@@ -4,7 +4,7 @@ This is a little and fast library for pathfinding in 2D space around convex-poly
 The implementation can walk around the obstacles at a given distance (if the actor is not a zero-width point, but has some physical size).
 The poeject also contains a little demo.
 
-![Example of the demo output](https://raw.githubusercontent.com/ilyanikolaevsky/navmesh/picture.png)
+![Example of the demo output](https://github.com/ilyanikolaevsky/navmesh/blob/master/picture.png?raw=true)
 
 ## Usage
 
