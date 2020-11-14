@@ -1,8 +1,10 @@
 # NavMesh
 
-A little demo for pathfinding in 2D space around convex-polygonal obstacles. This may be useful in GameDev.
+This is a little and fast library for pathfinding in 2D space around convex-polygonal obstacles. This may be useful in GameDev.
+The implementation can walk around the obstacles at a given distance (if the actor is not a zero-width point, but has some physical size).
+The poeject also contains a little demo.
 
-Finds optimal paths from one source to one destination walking around obstacles at a given distance.
+![Example of the demo output](https://raw.githubusercontent.com/ilyanikolaevsky/navmesh/picture.png)
 
 ## Usage
 
@@ -62,9 +64,13 @@ The repository has Visual Studio 2019 project files necessary to build it in ``b
 Simply open NavMesh.sln in the Visual Studio 2019 or later. ``source`` project builds a static library, ``demo`` builds a demo and ``tests`` runs tests.
 
 On other platforms you can execute:
-``` mkdir build
+```
+mkdir build
 cd build
-cmake ..```
+cmake ..
+```
+
+Then either run ``make`` or use other platform specific build tool.
 
 ## Further work
 
@@ -79,4 +85,4 @@ If there's a single source and many destinations (or the other way around), a Di
 Also, the ``AddPolygons`` method could be updated to work with a timelimit and continue its work from the previous call (by splitting the loop on polygons). 
 This way the caller may call this method on each frame and not loose fps. ``AddExternalPoints`` and ``GetPath`` should do nothing until ``AddPolygons`` has finished all the work.
 
-Finally, a routine to split non-convex polygons to a unity of several convex polygons should be provided.
+Finally, a routine to split non-convex polygons to a unity of several convex polygons should be implemented.
