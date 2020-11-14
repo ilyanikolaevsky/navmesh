@@ -8,9 +8,10 @@ The poeject also contains a little demo.
 
 ## Usage
 
-You need to include ``PathFinder.*``, ``Vec.*``, ``Segment.*``, ``Polygon.*`` files in your project.
+You need to include ``path_finder.h``, ``point.h``, ``segment.h``, ``polygon.h`` files in your project and link against the static library.
+Alternatively, since it's a small project, you can just add all files from ``source/`` to your project.
 
-The main class is ``NavMesh::PathFinder``. There are also ``NavMesh::Vec``, ``NavMesh::Segment`` and ``NavMesh::Polygon`` for geometrical logic.
+The main class is ``NavMesh::PathFinder``. There are also ``NavMesh::Point``, ``NavMesh::Segment`` and ``NavMesh::Polygon`` for geometrical logic.
 
 ``PathFinder::AddPolygons`` should be called each time the map changes.
 This is the slowest one, which takes ``O(n^3*k)`` time, where ``n``in the number of polygons, and ``k`` is average number of points in each.
@@ -36,8 +37,8 @@ The path calulations on the graph take less than 1ms. Already computed tangents 
 ``path_finder.cpp`` has main class, which invoces geometry calculations, constructs the graph and uses A* to find the path between two given points.
 
 ## Demo
-A demo is a simple windows GUI application. It uses GDI+ to draw obstacles and a found path, as well as outputting some statistics.
-The user interaction is mostly happening through the meny. Following items are available:
+A demo is a simple windows GUI application. It uses GDI+ to draw obstacles and the found path, as well as outputting some statistics.
+The user interaction is mostly happening through the menu. Following items are available:
 
 * Polygon
   * Add - click on the screen to add the point to the new polygon. Right click to add the polygon to the map.
