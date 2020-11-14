@@ -1,0 +1,6 @@
+.vs
+packages
+benchmark
+Release
+Debug
+*.aps
