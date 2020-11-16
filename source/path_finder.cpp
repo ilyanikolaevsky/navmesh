@@ -5,7 +5,7 @@
 
 namespace NavMesh {
 
-	void PathFinder::AddPolygons(const std::vector<Polygon>& polygons_to_add, double inflate_by = 0.0)
+	void PathFinder::AddPolygons(const std::vector<Polygon>& polygons_to_add, int inflate_by = 0)
 	{
 		polygons_.clear();
 		v_.clear();
@@ -13,7 +13,7 @@ namespace NavMesh {
 		vertex_ids_.clear();
 		polygons_.reserve(polygons_to_add.size());
 		for (auto const& p : polygons_to_add) {
-			polygons_.push_back(p.Inflate(inflate_by));
+			polygons_.emplace_back(p.Inflate(inflate_by));
 			// Don't add polygons which are not really an obstacle.
 			if (polygons_.back().Size() < 1) polygons_.pop_back();
 		}
@@ -188,7 +188,7 @@ namespace NavMesh {
 			done[bst] = true;
 			if (bst == dest) break;
 			for (const auto& e : edges_[bst]) {
-				if (dist[e.first] < 0 || dist[e.first] > dist[bst] + e.second + 1e-9) {
+				if (dist[e.first] < 0 || dist[e.first] > dist[bst] + e.second) {
 					dist[e.first] = dist[bst] + e.second;
 					est[e.first] = dist[e.first] + (v_[dest] - v_[e.first]).Len();
 					// Put negative distance esimate since the queue is for maximum and we 

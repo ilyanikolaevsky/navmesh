@@ -15,12 +15,13 @@ namespace NavMesh {
 		~Polygon();
 
 		Polygon& operator=(Polygon&&);
+		Polygon& operator=(const Polygon&);
 
 		// Adds point to the polygon. 
 		// If it lies inside the polygon or on the side, 
 		// it will be ignored.
 		void AddPoint(const Point& a);
-		void AddPoint(double x, double y);
+		void AddPoint(int x, int y);
 
 		// Checks if |a| is strictly inside the polygon.
 		// Returns false if |a| coincides with some vertex 
@@ -51,8 +52,10 @@ namespace NavMesh {
 
 		// Inflates the polygon such that resulting boundary
 		// is at least |r| units away from the polygon.
-		// Doubles the number of points if |r > 0|
-		Polygon Inflate(double r) const;
+		//
+		// Constructs Minkowski sum of the polygon and 2*r x 2*r square centered at 0.
+		// Increases number of points by at most 4.
+		Polygon Inflate(int r) const;
 
 		// Returns ids of two points which are endpoints for
 		// two tangents (in different directions).
@@ -91,10 +94,11 @@ namespace NavMesh {
 		void OrderCounterClockwiseAndRemoveCollinearPoints();
 
 		// All points x coordinates sorted. Used for fast IsInside algorithm.
-		mutable std::vector<double> xs_;
-		// Coefficients for top and buttom y=kx+b lines for each vertical segment.
+		mutable std::vector<int> xs_;
+		// Coefficients for top and buttom a*x+b*y+c == 0 lines for each vertical segment.
+		// |b| is always positive.
 		// i-th entry corresponds for lines between x[i]..x[i+1];
-		mutable std::vector<std::pair<double, double>> top_lines_, bottom_lines_;
+		mutable std::vector<std::pair<std::pair<int, int>, long long>> top_lines_, bottom_lines_;
 
 		std::pair<int, int> GetTangentIdsNaive(const Point& a) const;
 		std::pair<int, int> GetTangentIdsLogarithmic(const Point& a) const;

@@ -24,7 +24,7 @@ namespace NavMesh {
 		// the graph. It's worse for low volume of polygons or if polygons are
 		// randomly and uniformly distributed on the map. It's better
 		// if there's some structure on the map and polygons are clustered.
-		void AddPolygons(const std::vector<Polygon>& polygons_to_add, double inflate_by);
+		void AddPolygons(const std::vector<Polygon>& polygons_to_add, int inflate_by);
 		
 		// Call any time after AddPolygons().
 		// It removes previously added external points and adds

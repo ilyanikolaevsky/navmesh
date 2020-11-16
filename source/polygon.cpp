@@ -3,7 +3,6 @@
 #include <algorithm>
 
 namespace NavMesh {
-	const double eps = 1e-11;
 
 	Polygon::Polygon() = default;
 
@@ -28,6 +27,14 @@ namespace NavMesh {
 		return *this;
 	}
 
+	Polygon& Polygon::operator=(const Polygon& other) {
+		points_ = other.points_;
+		xs_ = other.xs_;
+		top_lines_ = other.top_lines_;
+		bottom_lines_ = other.bottom_lines_;
+		return *this;
+	}
+
 	// TODO: Add fast path for when the new point is already provided
 	// in the correct order. Between last and the first.
 	// Make |points| private.
@@ -46,7 +53,7 @@ namespace NavMesh {
 		Point new_side1 = a - points_.back();
 		Point new_side2 = points_[0] - a;
 		Point next_side = points_[1] - points_[0];
-		if ((prev_side ^ new_side1) > eps && (new_side1 ^ new_side2) > eps && (new_side2 ^ next_side) > eps) {
+		if ((prev_side ^ new_side1) > 0 && (new_side1 ^ new_side2) > 0 && (new_side2 ^ next_side) > 0) {
 			points_.push_back(a);
 			xs_.clear();
 			return;
@@ -69,7 +76,7 @@ namespace NavMesh {
 		if (i2 == (i1 + 1) % points_.size()) {
 			Point v1 = points_[i1] - a;
 			Point v2 = points_[i2] - a;
-			if (fabs(v1 ^ v2) < eps && v1 * v2 < eps) return;
+			if ((v1 ^ v2) == 0 && v1 * v2 <= 0) return;
 		}
 
 		int n = points_.size();
@@ -105,7 +112,7 @@ namespace NavMesh {
 		xs_.clear();
 	}
 
-	void Polygon::AddPoint(double x, double y)
+	void Polygon::AddPoint(int x, int y)
 	{
 		AddPoint(Point(x, y));
 	}
@@ -124,7 +131,7 @@ namespace NavMesh {
 
 		// Points lying to the left of the first column, or to
 		// the right of the last column can't be inside the polygon.
-		if (a.x < xs_.front() + eps || a.x > xs_.back() - eps) {
+		if (a.x <= xs_.front() || a.x >= xs_.back()) {
 			return false;
 		}
 
@@ -135,8 +142,8 @@ namespace NavMesh {
 		// Plug a.x into y=k*x+b of the lines to get at
 		// that y are the boundaries for the given x.
 		// Check that a.y lies strictly between them.
-		return (top.first * a.x + top.second > a.y + eps &&
-			bottom.first * a.x + bottom.second < a.y - eps);
+		return (top.first.first * static_cast<long long>(a.x) + top.first.second * static_cast<long long>(a.y) + top.second < 0) &&
+			(bottom.first.first * static_cast<long long>(a.x) + bottom.first.second * static_cast<long long>(a.y) + bottom.second > 0);
 	}
 
 	int Polygon::Size() const
@@ -158,9 +165,9 @@ namespace NavMesh {
 		Point r;
 		Point le;
 		Point lr;
-		double chord_dir;
-		double l_dir;
-		double r_dir;
+		long long chord_dir;
+		long long l_dir;
+		long long r_dir;
 
 		if (tangents.first == tangents.second) {
 			int n = points_.size();
@@ -169,7 +176,7 @@ namespace NavMesh {
 			// strictly between two sides.
 			l = points_[(tangents.first - 1 + n) % n] - s.b;
 			r = points_[(tangents.second + 1) % n] - s.b;
-			return (l ^ v) < -eps && (v ^ r) < -eps;
+			return (l ^ v) < 0 && (v ^ r) < 0;
 		}
 
 		l = points_[tangents.first] - s.b;
@@ -182,7 +189,7 @@ namespace NavMesh {
 
 		// Endpoint lies beyond the chord.
 		// Intersection if |v| between |l| and |r| or even touches them.
-		return chord_dir > eps && (l ^ v) < -eps && (v ^ r) < -eps;
+		return chord_dir > 0 && l_dir < 0 && r_dir < 0;
 	}
 
 	void Polygon::Clear()
@@ -196,67 +203,52 @@ namespace NavMesh {
 		return points_[i];
 	}
 
-	Polygon Polygon::Inflate(double r) const
+	Polygon Polygon::Inflate(int r) const
 	{
-		// Fast case for no inflation.
-		if (r < eps) return *this;
-
 		Polygon res;
-		int n = points_.size();
 
-		if (n == 0) {
-			return *this;
-		}
-		else if (n == 1) {
-			res.points_.resize(4);
-			res.points_[0] = points_[0] + Point(r, r);
-			res.points_[1] = points_[0] + Point(-r, r);
-			res.points_[2] = points_[0] + Point(-r, -r);
-			res.points_[3] = points_[0] + Point(r, -r);
-			return res;
-		}
-		else if (n == 2) {
-			res.points_.resize(4);
-			Point hor = (points_[1] - points_[0]);
-			hor = hor * (r / hor.Len());
-			Point vert = hor.Rotate90clockwise();
-			res.points_[0] = points_[0] - hor - vert;
-			res.points_[1] = points_[0] - hor + vert;
-			res.points_[2] = points_[1] + hor + vert;
-			res.points_[3] = points_[1] + hor - vert;
+		if (r == 0) {
+			res = *this;
 			return res;
 		}
 
-		// General case.
-		// Calculate new points for any poing of the polygon.
-		for (int i = 0; i < n; ++i) {
-			Point v1 = points_[i] - points_[(i - 1 + n) % n];
-			Point v2 = points_[(i + 1) % n] - points_[i];
+		if (points_.empty()) return res;
 
-			// Skip nodes on straigt sides.
-			if (fabs(v1 ^ v2) < eps) continue;
+		// Sides of a 2*r x 2*r square.
+		Point inflation_sides[4] = { {2*r, 0}, {0, 2*r}, {-2*r, 0}, {0, -2*r} };
 
-			// Get normals and normalize all vectors.
-			v1 = v1 * (1.0 / v1.Len());
-			Point n1 = v1.Rotate90clockwise();
-			v2 = v2 * (1.0 / v2.Len());
-			Point n2 = v2.Rotate90clockwise();
-
-			// cos() for angle between two normals.
-			double cosa = (n1 * n2);
-
-			// Move sides outward by r (By n1 and n2 respectively).
-			// Add two points on them such that line between them is at least r
-			// away from the point i.
-			// 4 equal right triangles can be noticed with acute angle a/4.
-			// We can find the point by moving for r along the normal
-			// and r*tg(a/4) along the side toward the i-th point.
-
-			double tga4 = (sqrt((1 - cosa) / 2)) / (1 + sqrt((1 + cosa) / 2));
-			double r2 = r * tga4;
-			res.points_.push_back(points_[i] + n1 * r + v1 * r2);
-			res.points_.push_back(points_[i] + n2 * r - v2 * r2);
+		// Find leftmost bottom corner.
+		int start = 0;
+		for (int i = 0; i < points_.size(); ++i) {
+			if (points_[i] < points_[start]) start = i;
 		}
+
+		// Apply either sides of the polygon or of the square: whichever comes first in CCW order.
+		int cur_inflation = 0;
+		int cur_point_id = start;
+		Point cur_point = points_[start] + Point(-r, -r);
+		do {
+			res.points_.push_back(cur_point);
+			int next = (cur_point_id + 1) % points_.size();
+			Point side = points_[next] - points_[cur_point_id];
+			long long dir = side ^ inflation_sides[cur_inflation];
+
+			if (dir > 0) {
+				cur_point = cur_point + side;
+				cur_point_id = next;
+			}
+			else if (dir < 0) {
+				cur_point = cur_point + inflation_sides[cur_inflation];
+				cur_inflation = (cur_inflation + 1) % 4;
+			}
+			else {
+				cur_point = cur_point + side + inflation_sides[cur_inflation];
+				cur_inflation = (cur_inflation + 1) % 4;
+				cur_point_id = next;
+			}
+
+		} while (cur_inflation != 0 || cur_point_id != start);
+
 		return res;
 	}
 
@@ -287,10 +279,14 @@ namespace NavMesh {
 			if (next.x > points_[i].x) {
 				// Side goes left to right: It's a bottom side.
 
-				// Find equation for current side: y=kx+b.
-				double k = (next.y - points_[i].y) / (next.x - points_[i].x);
-				double b = points_[i].y - k * points_[i].x;
-				auto line = std::make_pair(k, b);
+				// Find equation for current side: a*x+b*y+c = 0.
+				// b should be positive.
+				int a = points_[i].y - next.y;
+				int b = next.x - points_[i].x;
+				long long c = -static_cast<long long>(a) * next.x -
+					static_cast<long long>(b) * next.y;
+				auto line = std::make_pair(std::make_pair(a, b), c);
+
 				// Current line is the buttom for all vertical segments,
 				// which start strictly before the right end of this side.
 				for (cur_x = cur_x; xs_[cur_x] < next.x; ++cur_x) {
@@ -300,10 +296,14 @@ namespace NavMesh {
 			else if (next.x < points_[i].x) {
 				// Side goes right to left: It's a top side.
 
-				// Find equation for current side: y=kx+b.
-				double k = (next.y - points_[i].y) / (next.x - points_[i].x);
-				double b = points_[i].y - k * points_[i].x;
-				auto line = std::make_pair(k, b);
+				// Find equation for current side: a*x+b*y+c = 0.
+				// b should be positive.
+				int a = next.y - points_[i].y;
+				int b = points_[i].x - next.x;
+				long long c = -static_cast<long long>(a) * next.x -
+					static_cast<long long>(b) * next.y;
+				auto line = std::make_pair(std::make_pair(a, b), c);
+
 				// Current line is the buttom for all vertical segments,
 				// which start strictly before current x, and after or at
 				// the next x.
@@ -332,12 +332,12 @@ namespace NavMesh {
 		for (int i = 0; i < n; ++i) {
 			Point v1 = points_[i] - points_[(i - 1 + n) % n];
 			Point v2 = points_[(i + 1) % n] - points_[i];
-			double dir = v1 ^ v2;
-			if (dir < -eps) {
+			long long dir = v1 ^ v2;
+			if (dir < 0) {
 				//  Concave point.
 				bad_point[i] = true;
 			}
-			else if (dir < eps && v1 * v2 > eps) {
+			else if (dir == 0 && v1 * v2 > 0) {
 				// Point on side.
 				bad_point[i] = true;
 			}
@@ -361,16 +361,16 @@ namespace NavMesh {
 		if (n == 2) {
 			Point to_0 = points_[0] - a;
 			Point to_1 = points_[1] - a;
-			double dir = to_0 ^ to_1;
-			if (dir < -eps) {
+			long long dir = to_0 ^ to_1;
+			if (dir < 0) {
 				return { 0, 1 };
 			}
-			else if (dir > eps) {
+			else if (dir > 0) {
 				return { 1, 0 };
 			}
 			else {
 				// dir == 0, collinear points.
-				if (to_0 * to_1 > -eps) {
+				if (to_0 * to_1 >= 0) {
 					// |a| lies on the line outside of the segment or on the vertex.
 					return to_0.Len2() < to_1.Len2() ? std::make_pair(0, 0) : std::make_pair(1, 1);
 				}
@@ -381,7 +381,7 @@ namespace NavMesh {
 			}
 		}
 		// Use naive O(|n|) bruteforce algorihtm.
-		double dir_prev;
+		long long dir_prev;
 		// Precompute for the first vertex.
 		Point vprev = points_[0] - points_[n - 1];
 		Point to_vprev = points_[n - 1] - a;
@@ -393,7 +393,7 @@ namespace NavMesh {
 			}
 			Point to_vi = points_[i] - a;
 			Point vi = points_[(i + 1) % n] - points_[i];
-			double dir_i = to_vi ^ vi;
+			long long dir_i = to_vi ^ vi;
 
 			// Positive values are for "dark side" sides.
 			// Negative values are for front side. 
@@ -401,13 +401,13 @@ namespace NavMesh {
 			// "+" are always present, but there may be no "-" (if |a| is some vertex).
 
 			// First tangent is the  "0/-" vertex, preceeded by "+" vertex
-			if (dir_i < eps && dir_prev > eps) {
+			if (dir_i <= 0 && dir_prev > 0) {
 				// This is tangent going "forward" in along the polygon.
 				res.first = i;
 			}
 
 			// Second tangent is the "+" vertex, preceeded by "0/-" vertex.
-			if (dir_i > eps && dir_prev < eps) {
+			if (dir_i > 0 && dir_prev <= 0) {
 				// This is tangent going backward along the polygon.
 				res.second = i;
 			}
@@ -426,7 +426,7 @@ namespace NavMesh {
 		Point to_next = points_[next] - a;
 
 		// Should choose the next vertex, if found is "0" vertex and the next is "-/0".
-		if (fabs(to_v ^ v) < eps && (to_next ^ v_next) < eps) {
+		if ((to_v ^ v) == 0 && (to_next ^ v_next) <= 0) {
 			res.first = next;
 		}
 
@@ -436,7 +436,7 @@ namespace NavMesh {
 
 		// Should choose the previous vertex, if that previous point is "0" node,
 		// but not the same vertex, which the first tangent is pointing at, unless |a| is equal to it.
-		if ((res.first != prev || a == points_[prev]) && fabs(to_prev ^ v_prev) < eps) {
+		if ((res.first != prev || a == points_[prev]) && (to_prev ^ v_prev) == 0) {
 			res.second = prev;
 		}
 
@@ -467,24 +467,24 @@ namespace NavMesh {
 		Point to_l = points_[0] - a;
 		Point v_prev = points_[0] - points_[n - 1];
 		Point to_prev = points_[n - 1] - a;
-		double pointing_l = to_l ^ vl;
-		double pointing_prev = to_prev ^ v_prev;
+		long long pointing_l = to_l ^ vl;
+		long long pointing_prev = to_prev ^ v_prev;
 		int l = 0;
 		int r = n - 1;
 		// Explicit check if the first is already the tangent.
-		if (pointing_prev > eps && pointing_l < eps) {
+		if (pointing_prev > 0 && pointing_l <= 0) {
 			res.first = 0;
 			// Check if we could move it forward:
 			// if 0-th node is a "0" node and the next is "-/0" node.
 			// If both 0-th and 1-st nodes are "0" nodes, then |a == points[1]|.
-			if (pointing_l > -eps) {
+			if (pointing_l == 0) {
 				Point v_next = points_[2] - points_[1];
 				Point to_next = points_[1] - a;
-				double pointing_next = to_next ^ v_next;
-				if (pointing_next < -eps) {
+				long long pointing_next = to_next ^ v_next;
+				if (pointing_next < 0) {
 					res.first = 1;
 				}
-				else if (pointing_next < eps) {
+				else if (pointing_next == 0) {
 					return { 1, 1 };
 				}
 			}
@@ -498,16 +498,16 @@ namespace NavMesh {
 				// l < m < r. Hence m+1 is still a valid index.
 				Point vm = points_[m + 1] - points_[m];
 				Point to_m = points_[m] - a;
-				double pointing_m = to_m ^ vm;
-				double lm_dir = to_l ^ to_m;
+				long long pointing_m = to_m ^ vm;
+				long long lm_dir = to_l ^ to_m;
 
 				// The switch happened between l and m iff:
 				// - l-th  is "+" vertex and m-th is "-/0" vertex.
-				//   I.e. |pointing_l > eps && pointint_m < eps|
+				//   I.e. |pointing_l > 0 && pointint_m <= 0|
 				// - both are "+" vertices and |m| is strictly to the right of |l|.
-				//   I.e. |pointing_l > eps && pointint_m > eps && lm_dir < -eps|
+				//   I.e. |pointing_l > 0 && pointint_m > 0 && lm_dir < 0|
 				// - both are "0/-" and |m| is non-strictly to the left of "l"
-				//   I.e. |pointing_l < eps && pointint_m < eps && lm_dir > -eps|
+				//   I.e. |pointing_l <= 0 && pointint_m <= 0 && lm_dir >= 0|
 				//
 				// Regarding the strict/non-strict comparison of |lm_dir|: for the second
 				// case it doesn't matter, slince |lm_dir| can't be 0 for both "+" points
@@ -520,8 +520,8 @@ namespace NavMesh {
 				// For symmetry with the case below -eps is chosen in both cases.
 				//
 				// Below code is simplification of the 3 conditions above.
-				if (((pointing_m < eps) || (lm_dir < -eps)) &&
-					((pointing_l > eps) || (lm_dir > -eps))) {
+				if (((pointing_m <= 0) || (lm_dir < 0)) &&
+					((pointing_l > 0) || (lm_dir >= 0))) {
 					// Overshoot.
 					// |m| is the desired point or something to the right of it.
 					r = m;
@@ -540,21 +540,21 @@ namespace NavMesh {
 			int next = (r + 1) % n;
 			Point to_r = points_[r] - a;
 			Point vr = points_[next] - points_[r];
-			double pointing_r = to_r ^ vr;
-			if (pointing_r < eps && pointing_l > eps) {
+			long long pointing_r = to_r ^ vr;
+			if (pointing_r <= 0 && pointing_l > 0) {
 				res.first = r;
 				// Check if we could move the point forward.
 				Point v_next = points_[(next + 1) % n] - points_[next];
 				Point to_next = points_[next] - a;
-				double pointing_next = to_next ^ v_next;
+				long long pointing_next = to_next ^ v_next;
 
 				// Should choose the next vertex, if found is "0" vertex and the next is "-/0".
 				// If the both r and next are 0, then |a = points[r + 1]|
-				if (pointing_r > -eps) {
-					if (pointing_next < -eps) {
+				if (pointing_r == 0) {
+					if (pointing_next < 0) {
 						res.first = next;
 					}
-					else if (pointing_next < eps) {
+					else if (pointing_next == 0) {
 						return { next, next };
 					}
 				}
@@ -572,13 +572,13 @@ namespace NavMesh {
 		l = 0;
 		r = n - 1;
 		// Explicit check if the first is already the tangent.
-		if (pointing_prev < eps && pointing_l > eps) {
+		if (pointing_prev <= 0 && pointing_l > 0) {
 			res.second = 0;
 			// Check if we could move it forward.
 			// Can do it iff the previous node is "0" vertex,
 			// but not the same vertex, which the first tangent is pointing at, unless |a| is equal to it.
 			// But the equality case is already processed after the first binary search.
-			if (res.first != n - 1 && pointing_prev > -eps) {
+			if (res.first != n - 1 && pointing_prev == 0) {
 				res.second = n - 1;
 			}
 		}
@@ -591,16 +591,16 @@ namespace NavMesh {
 				// l < m < r. Hence m+1 is still a valid index.
 				Point vm = points_[m + 1] - points_[m];
 				Point to_m = points_[m] - a;
-				double pointing_m = to_m ^ vm;
-				double lm_dir = to_l ^ to_m;
+				long long pointing_m = to_m ^ vm;
+				long long lm_dir = to_l ^ to_m;
 
 				// The switch happened between l and m iff:
 				// - l-th  is "0/-" vertex and m-th is "+" vertex.
-				//   I.e. |pointing_l < eps && pointint_m > eps|
+				//   I.e. |pointing_l <= 0 && pointint_m > 0|
 				// - both are "+" vertices and |m| is non-strictly to the right of |l|.
-				//   I.e. |pointing_l > eps && pointint_m > eps && lm_dir < eps|
+				//   I.e. |pointing_l > 0 && pointint_m > 0 && lm_dir <= 0|
 				// - both are "0/-" and |m| is strictly to the left of "l"
-				//   I.e. |pointing_l < eps && pointint_m < eps && lm_dir > eps|
+				//   I.e. |pointing_l <= 0 && pointint_m <= 0 && lm_dir > 0|
 				//
 				// Regarding the strict/non-strict comparison of |lm_dir|: for the second
 				// case it doesn't matter, slince |lm_dir| can't be 0 for both "+" points
@@ -610,8 +610,8 @@ namespace NavMesh {
 				// which is the second tangent. That's why the condition there is strict.
 				//
 				// Below code is the simplification of the 3 conditions above.
-				if (((pointing_l < eps) || (lm_dir < eps)) &&
-					((pointing_m > eps) || (lm_dir > eps))) {
+				if (((pointing_l <= 0) || (lm_dir <= 0)) &&
+					((pointing_m > 0) || (lm_dir > 0))) {
 					// Overshoot.
 					// |m| is the desired point or something to the right of it.
 					r = m;
@@ -628,14 +628,14 @@ namespace NavMesh {
 			// between |l| and |r|
 			Point to_r = points_[r] - a;
 			Point vr = points_[(r + 1) % n] - points_[r];
-			double pointing_r = to_r ^ vr;
-			if (pointing_r > eps && pointing_l < eps) {
+			long long pointing_r = to_r ^ vr;
+			if (pointing_r > 0 && pointing_l <= 0) {
 				res.second = r;
 				// Check if we should move the answer backward.
 				// Should choose the previous vertex, if that previous point is "0" node,
 				// but not the same vertex, which the first tangent is pointing at, unless |a| is equal to it.
 				// But the equality case is already processed after the first binary search.
-				if ((res.first != l) && pointing_l > -eps) {
+				if ((res.first != l) && pointing_l == 0) {
 					res.second = l;
 				}
 			}
@@ -661,8 +661,8 @@ namespace NavMesh {
 		Point v1 = points_[i] - points_[(i + n - 1) % n];
 		Point v = a - points_[i];
 		Point v2 = points_[(i + 1) % n] - points_[i];
-		double dir1 = (v1 ^ v);
-		double dir2 = (v ^ v2);
+		long long dir1 = (v1 ^ v);
+		long long dir2 = (v ^ v2);
 
 		// v lies between v1 and v2 or -v lies between v1 and v2.
 		// Strict and unstrict checks allow only closest points
@@ -670,10 +670,10 @@ namespace NavMesh {
 		// Also, allow the point to be on one of the sides.
 		// But not on both of them, since this would mean that the segment is
 		// of a zero length. No sense adding this as an edge.
-		return (dir1 > -eps && dir2 > eps) ||
-			(dir1 < -eps && dir2 < eps) ||
-			((fabs(dir2) < eps && v.Len2() < v2.Len2()) ^
-				(fabs(dir1) < eps && v.Len2() < v1.Len2()));
+		return (dir1 >= 0 && dir2 > 0) ||
+			(dir1 < 0 && dir2 <= 0) ||
+			((dir2 == 0 && v.Len2() < v2.Len2()) ^
+				(dir1 == 0 && v.Len2() < v1.Len2()));
 	}
 
 }

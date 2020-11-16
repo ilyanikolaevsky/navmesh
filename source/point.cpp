@@ -12,47 +12,44 @@ namespace NavMesh {
 
 	// Scalar multiplication.
 	double Point::operator*(const Point& other) const {
-		return (double)x * other.x + y * other.y;
+		return (long long)x * other.x + (long long)y * other.y;
 	}
 
 	// Pointtor multiplication.
 	double Point::operator^(const Point& other) const {
-		return (double)x * other.y - y * other.x;
+		return (long long)x * other.y - (long long)y * other.x;
 	}
 
-	Point Point::operator*(double k) const
+	Point Point::operator*(int k) const
 	{
 		return Point(x * k, y * k);
 	}
 
 	bool Point::operator==(const Point& other) const
 	{
-		return fabs(x - other.x) < 1e-9 && fabs(y - other.y) < 1e-9;
+		return x == other.x && y == other.y;
 	}
 
 	bool Point::operator!=(const Point& other) const
 	{
-		return fabs(x - other.x) > 1e-9 || fabs(y - other.y) > 1e-9;
+		return x != other.x || y != other.y;
 	}
 
 	bool Point::operator<(const Point& other) const
 	{
-		return x < other.x || (fabs(x - other.x) < 1e-9 && y < other.y);
+		return x < other.x || (x  == other.x && y < other.y);
 	}
 
-	// Length of the Pointtor.
-	double Point::Len() const {
-		return sqrt(x * x + y * y);
-	}
 
-	double Point::Len2() const
+	double Point::Len() const
 	{
-		return x * x + y * y;
+		return sqrt(static_cast<double>(x) * x + static_cast<double>(y) * y);
 	}
 
-	Point Point::Rotate90clockwise() const
+	long long Point::Len2() const
 	{
-		return Point(y, -x);
+		return static_cast<long long>(x) * x + static_cast<long long>(y) * y;
 	}
+
 
 }

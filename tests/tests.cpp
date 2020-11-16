@@ -48,18 +48,6 @@ TEST(Point, OperationsConsistent) {
 	EXPECT_EQ((a * k) ^ b, (a ^ b) * k);
 }
 
-TEST(Point, Rotate) {
-	Point a(3, 7);
-	Point b = a.Rotate90clockwise();
-	// Perpendicular.
-	EXPECT_EQ(a * b, 0);
-	// Same length.
-	EXPECT_EQ(a.Len(), b.Len());
-	// Rotates clockwise.
-	EXPECT_LT(a ^ b, 0);
-}
-
-
 TEST(Segment, Intersects) {
 	Segment s1(Point(0, 0), Point(10, 0));
 
@@ -476,21 +464,24 @@ TEST(Polygon, IsTangentConsistent) {
 
 
 double GetDistanceFromPointToSegment(Point o, Point s1, Point s2) {
-	// Get equation for the line P * k + c = 0
-	Point k = (s2 - s1).Rotate90clockwise();
-	k = k * (1 / k.Len());
-	double c = -(k * s1);
+	// Get equation for the line a*x+b*y+c with a^2+b^2=1.
+	double a = s2.y - s1.y;
+	double b = s1.x - s2.x;
+	double d = sqrt(a * a + b * b);
+	a /= d;
+	b /= d;
+	double c = -s1.x * a - s1.y * b;
 	// Get signed distance to the line.
-	double distance = o * k + c;
-	// Project to the line.
-	Point projection = o + (k * (-distance));
-	EXPECT_NEAR((projection * k) + c, 0.0, 1e-9);
-	distance = fabs(distance);
-	// Projection outside of the segment:
-	if (((projection - s1) ^ (projection - s2)) > 1e-9) {
-		distance = std::min((s1 - o).Len(), (s2 - o).Len());
+	double distance = fabs(a * o.x + b * o.y + c);
+	// Check if projection of o lies inside the segment.
+	long long dir1 = (o - s1) * (s2 - s1);
+	long long dir2 = (o - s2) * (s1 - s2);
+
+	if (dir1 >= 0 && dir2 >= 0) {
+		return distance;
+	} else {
+		return std::min((s1 - o).Len(), (s2 - o).Len());
 	}
-	return distance;
 }
 
 TEST(Polygon, InflateOnePoint) {
@@ -503,7 +494,7 @@ TEST(Polygon, InflateOnePoint) {
 
 	// Corners spaced at right angles.
 	for (int i = 0; i < 4; ++i) {
-		EXPECT_NEAR((res[i] - o) * (res[(i + 1) % 4] - o), 0, 1e-9);
+		EXPECT_EQ((res[i] - o) * (res[(i + 1) % 4] - o), 0);
 	}
 
 	// Corners rotate counter clockwise.
@@ -525,7 +516,7 @@ TEST(Polygon, InflateSegment) {
 	p.AddPoint(100, 304);
 	p.AddPoint(108, 254);
 	float kInflationDistance = 10.0;
-	const int kExpectedNumPoints = 4;
+	const int kExpectedNumPoints = 6;
 	Polygon res = p.Inflate(kInflationDistance);
 	ASSERT_EQ(res.Size(), kExpectedNumPoints);
 
@@ -552,7 +543,7 @@ TEST(Polygon, InflateTriangle) {
 	p.AddPoint(108, 254);
 	p.AddPoint(50, 101);
 	float kInflationDistance = 10.0;
-	const int kExpectedNumPoints = 6;
+	const int kExpectedNumPoints = 7;
 	Polygon res = p.Inflate(kInflationDistance);
 	ASSERT_EQ(res.Size(), kExpectedNumPoints);
 
