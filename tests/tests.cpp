@@ -19,18 +19,18 @@ TEST(Point, Adds) {
 }
 
 TEST(Point, ScalarMultiplication) {
-	EXPECT_EQ(Point(10, 0) * Point(0, 10), 0.0);
-	EXPECT_EQ(Point(10, 1) * Point(-1, 10), 0.0);
-	EXPECT_EQ(Point(10, 10) * Point(10, 10), 200.0);
+	EXPECT_EQ(Point(10, 0) * Point(0, 10), 0);
+	EXPECT_EQ(Point(10, 1) * Point(-1, 10), 0);
+	EXPECT_EQ(Point(10, 10) * Point(10, 10), 200);
 	EXPECT_EQ(Point(1, 2) * Point(3, 4), 11);
-	EXPECT_EQ(Point(0, 0) * Point(3, 4), 0.0);
+	EXPECT_EQ(Point(0, 0) * Point(3, 4), 0);
 }
 
 TEST(Point, VectorMultiplication) {
-	EXPECT_EQ(Point(10, 0) ^ Point(0, 10), 100.0);
-	EXPECT_EQ(Point(10, 1) ^ Point(100, 10), 0.0);
+	EXPECT_EQ(Point(10, 0) ^ Point(0, 10), 100);
+	EXPECT_EQ(Point(10, 1) ^ Point(100, 10), 0);
 	EXPECT_EQ(Point(1, 2) ^ Point(3, 4), -2);
-	EXPECT_EQ(Point(0, 0) ^ Point(3, 4), 0.0);
+	EXPECT_EQ(Point(0, 0) ^ Point(3, 4), 0);
 }
 
 TEST(Point, Scaling) {
@@ -282,204 +282,142 @@ TEST(Polygon, GetsTangentsTriangle) {
 }
 
 TEST(Polygon, GetsTangentsSmallPolygon) {
-	// Pentagon in 3x3 square
+	// Pentagon in 30x30 square
 	// Already provided in counter clockwise order.
 	Polygon p;
 	p.AddPoint(Point(0, 0));
-	p.AddPoint(Point(3, 0));
-	p.AddPoint(Point(3, 2));
-	p.AddPoint(Point(2, 3));
-	p.AddPoint(Point(0, 3));
+	p.AddPoint(Point(30, 0));
+	p.AddPoint(Point(30, 20));
+	p.AddPoint(Point(20, 30));
+	p.AddPoint(Point(0, 30));
 
 	Point a;
 	// All values computed by hand.
 	// On continuation of two sides.
-	a = Point(3, 3);
+	a = Point(30, 30);
 	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(2, 3));
-	a = Point(0, 5);
+	a = Point(0, 50);
 	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(3, 4));
 
 	// On a side.
-	a = Point(2, 0);
+	a = Point(20, 0);
 	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(0, 1));
-	a = Point(3, 1);
+	a = Point(30, 10);
 	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(1, 2));
-	a = Point(2.5, 2.5);
+	a = Point(25, 25);
 	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(2, 3));
-	a = Point(1, 3);
+	a = Point(10, 30);
 	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(3, 4));
-	a = Point(0, 2);
+	a = Point(0, 20);
 	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(4, 0));
 
 	// On a vertex.
 	a = Point(0, 0);
 	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(0, 0));
-	a = Point(3, 0);
+	a = Point(30, 0);
 	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(1, 1));
-	a = Point(3, 2);
+	a = Point(30, 20);
 	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(2, 2));
-	a = Point(2, 3);
+	a = Point(20, 30);
 	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(3, 3));
-	a = Point(0, 3);
+	a = Point(0, 30);
 	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(4, 4));
 
 	// Close to a side.
-	a = Point(2, -0.1);
+	a = Point(20, -1);
 	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(0, 1));
-	a = Point(3.1, 1);
+	a = Point(31, 10);
 	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(1, 2));
-	a = Point(2.6, 2.6);
+	a = Point(26, 26);
 	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(2, 3));
-	a = Point(1, 3.1);
+	a = Point(10, 31);
 	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(3, 4));
-	a = Point(-0.1, 2);
+	a = Point(-1, 20);
 	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(4, 0));
 
 
 	// Very far.
-	a = Point(100000, 1000000);
+	a = Point(1000000, 10000000);
 	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(1, 4));
 
-	a = Point(2, -1000000);
+	a = Point(20, -10000000);
 	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(0, 1));
 
 	// On continuation of one side far away.
-	a = Point(100000, 0);
+	a = Point(1000000, 0);
 	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(1, 3));
-	a = Point(0, 100000);
+	a = Point(0, 1000000);
 	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(2, 4));
 
 	// On continuation of one side close.
-	a = Point(4, 0);
+	a = Point(40, 0);
 	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(1, 2));
-	a = Point(0, 4);
+	a = Point(0, 40);
 	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(3, 4));
 
 }
 
-// Most sides have |kNumPointsPerSide|-1 added points.
-// Some sides don't, but |missing_points[i]| should contain cumulative sum of
-// number of such missing points on sides before the corner |i|.
-#define INFLATED_ANSWER(a, b) std::make_pair(a * kNumPointsPerSide - missing_points[a], b * kNumPointsPerSide - missing_points[b])
-
-Polygon GenerateInflatedPolygon(
-	std::vector<Point>& main_corners,
-	const int num_points_per_side,
-	const double center_distance,
-	std::vector<int>& missing_points) {
-	// To wrap around the end.
-	main_corners.push_back(main_corners.front());
-	// Some sides are not inflated. This will store how much points were not added.
-	missing_points.resize(main_corners.size() - 1);
-
-	Polygon p;
-
-	for (size_t i = 0; i + 1 < main_corners.size(); ++i) {
-		// Add a semicircle from main_corners[i] to main_corners[i+1]
-		// with a center far to the left of the side.
-		// The first corner is added on each iteration. 
-		// The last corner is added on the next iteration.
-		Point side = main_corners[i + 1] - main_corners[i];
-		Point midpoint = (main_corners[i] + main_corners[i + 1]) * 0.5;
-		// Negative scale, because the side should be rotated counter-clockwise to point inside.
-		Point center = midpoint + side.Rotate90clockwise() * (-center_distance / side.Len());
-		double r = (main_corners[i] - center).Len();
-		Point step = side * (1.0 / num_points_per_side);
-		Point projection = main_corners[i];
-		// Add points on circle from |center| with radius |r|
-		for (int j = 0; j < num_points_per_side; ++j) {
-			Point cur_point = projection - center;
-			cur_point = center + cur_point * (r / cur_point.Len());
-			p.AddPoint(cur_point);
-			projection = projection + step;
-			// Don't inflate sides along axis (since we want to test points on them).
-			if ((main_corners[i].x == 0 && main_corners[i + 1].x == 0) ||
-				(main_corners[i].y == 0 && main_corners[i + 1].y == 0)) {
-				missing_points[i] = num_points_per_side - 1;
-				break;
-			}
-		}
-	}
-
-	for (size_t i = 1; i < main_corners.size() - 1; ++i) {
-		missing_points[i] += missing_points[i - 1];
-	}
-	for (size_t i = main_corners.size() - 2; i > 0; --i) {
-		missing_points[i] = missing_points[i - 1];
-	}
-	missing_points[0] = 0;
-
-	return p;
-}
 
 TEST(Polygon, GetsTangentsBigPolygon) {
 	// Octogon inscribed in 1000x1000 square.
-	// Slightly inflated edges to greatly increase the size of the polygon.
-	// Dimensions are big enough, so inflation can be effectively ignored
-	// when finding answers by hand.
-	std::vector<Point> main_corners;
-	const int kNumPointsPerSide = 100;
-	const double kCenterDistance = 10000.0;
 
-	// Already provided in counter clockwise order.
-	main_corners.push_back(Point(300, 0));
-	main_corners.push_back(Point(700, 0));
-	main_corners.push_back(Point(1000, 300));
-	main_corners.push_back(Point(1000, 700));
-	main_corners.push_back(Point(700, 1000));
-	main_corners.push_back(Point(300, 1000));
-	main_corners.push_back(Point(0, 700));
-	main_corners.push_back(Point(0, 300));
+	Polygon p;
+	p.AddPoint(Point(300, 0));
+	p.AddPoint(Point(700, 0));
+	p.AddPoint(Point(1000, 300));
+	p.AddPoint(Point(1000, 700));
+	p.AddPoint(Point(700, 1000));
+	p.AddPoint(Point(300, 1000));
+	p.AddPoint(Point(0, 700));
+	p.AddPoint(Point(0, 300));
 
-	std::vector<int> missing_points;
-	Polygon p = GenerateInflatedPolygon(main_corners, kNumPointsPerSide, kCenterDistance, missing_points);
 
 	Point a;
 
 	// On continuation of two sides.
 	a = Point(0, 0);
-	EXPECT_EQ(p.GetTangentIds(a), INFLATED_ANSWER(7, 0));
+	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(7, 0));
 
 	// On a side.
 	a = Point(500, 0);
-	EXPECT_EQ(p.GetTangentIds(a), INFLATED_ANSWER(0, 1));
+	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(0, 1));
 	// On a side.
 	a = Point(0, 500);
-	EXPECT_EQ(p.GetTangentIds(a), INFLATED_ANSWER(6, 7));
+	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(6, 7));
 
 	// On a vertex.
 	a = Point(0, 300);
-	EXPECT_EQ(p.GetTangentIds(a), INFLATED_ANSWER(7, 7));
+	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(7, 7));
 	a = Point(700, 0);
-	EXPECT_EQ(p.GetTangentIds(a), INFLATED_ANSWER(1, 1));
+	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(1, 1));
 	a = Point(1000, 300);
-	EXPECT_EQ(p.GetTangentIds(a), INFLATED_ANSWER(2, 2));
+	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(2, 2));
 
 	// Close to a side.
 	a = Point(100, 100);
-	EXPECT_EQ(p.GetTangentIds(a), INFLATED_ANSWER(7, 0));
+	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(7, 0));
 	a = Point(500, -100);
-	EXPECT_EQ(p.GetTangentIds(a), INFLATED_ANSWER(0, 1));
+	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(0, 1));
 
 	// On continuation of one side close.
 	a = Point(-100, 0);
-	EXPECT_EQ(p.GetTangentIds(a), INFLATED_ANSWER(6, 0));
+	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(6, 0));
 
 	// Not so close to the polygon
 	a = Point(1350, 500);
-	EXPECT_EQ(p.GetTangentIds(a), INFLATED_ANSWER(1, 4));
+	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(1, 4));
 	a = Point(500, 1350);
-	EXPECT_EQ(p.GetTangentIds(a), INFLATED_ANSWER(3, 6));
+	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(3, 6));
 	a = Point(900, 900);
-	EXPECT_EQ(p.GetTangentIds(a), INFLATED_ANSWER(3, 4));
+	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(3, 4));
 	a = Point(1100, 1100);
-	EXPECT_EQ(p.GetTangentIds(a), INFLATED_ANSWER(2, 5));
+	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(2, 5));
 	a = Point(-100, -100);
-	EXPECT_EQ(p.GetTangentIds(a), INFLATED_ANSWER(6, 1));
+	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(6, 1));
 	a = Point(-100, 1100);
-	EXPECT_EQ(p.GetTangentIds(a), INFLATED_ANSWER(4, 7));
+	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(4, 7));
 	a = Point(1100, -100);
-	EXPECT_EQ(p.GetTangentIds(a), INFLATED_ANSWER(0, 3));
+	EXPECT_EQ(p.GetTangentIds(a), std::make_pair(0, 3));
 
 }
 
@@ -501,22 +439,16 @@ TEST(Polygon, IsTangentRejectsSelfIntersections) {
 }
 
 TEST(Polygon, IsTangentConsistent) {
-	std::vector<Point> main_corners;
-	const int kNumPointsPerSide = 100;
-	const double kCenterDistance = 10000.0;
 
-	// Already provided in counter clockwise order.
-	main_corners.push_back(Point(300, 0));
-	main_corners.push_back(Point(700, 0));
-	main_corners.push_back(Point(1000, 300));
-	main_corners.push_back(Point(1000, 700));
-	main_corners.push_back(Point(700, 1000));
-	main_corners.push_back(Point(300, 1000));
-	main_corners.push_back(Point(0, 700));
-	main_corners.push_back(Point(0, 300));
-
-	std::vector<int> missing_points;
-	Polygon p = GenerateInflatedPolygon(main_corners, kNumPointsPerSide, kCenterDistance, missing_points);
+	Polygon p;
+	p.AddPoint(Point(300, 0));
+	p.AddPoint(Point(700, 0));
+	p.AddPoint(Point(1000, 300));
+	p.AddPoint(Point(1000, 700));
+	p.AddPoint(Point(700, 1000));
+	p.AddPoint(Point(300, 1000));
+	p.AddPoint(Point(0, 700));
+	p.AddPoint(Point(0, 300));
 
 	const int n = p.Size();
 
@@ -646,55 +578,55 @@ TEST(Polygon, IsInsideSmallPolygon) {
 	// Already provided in counter clockwise order.
 	Polygon p;
 	p.AddPoint(Point(0, 0));
-	p.AddPoint(Point(3, 0));
-	p.AddPoint(Point(3, 2));
-	p.AddPoint(Point(2, 3));
-	p.AddPoint(Point(0, 3));
+	p.AddPoint(Point(30, 0));
+	p.AddPoint(Point(30, 20));
+	p.AddPoint(Point(20, 30));
+	p.AddPoint(Point(0, 30));
 
 	Point a;
 
 	// inside points.
-	a = Point(2, 2);
+	a = Point(20, 20);
 	EXPECT_TRUE(p.IsInside(a));
-	a = Point(1, 2);
+	a = Point(10, 20);
 	EXPECT_TRUE(p.IsInside(a));
-	a = Point(2, 1);
+	a = Point(20, 10);
 	EXPECT_TRUE(p.IsInside(a));
-	a = Point(0.5, 0.5);
+	a = Point(5, 5);
 	EXPECT_TRUE(p.IsInside(a));
 
 	// On a side.
-	a = Point(0, 1);
+	a = Point(0, 10);
 	EXPECT_FALSE(p.IsInside(a));
-	a = Point(1, 0);
+	a = Point(10, 0);
 	EXPECT_FALSE(p.IsInside(a));
-	a = Point(2.5, 2.5);
+	a = Point(25, 25);
 	EXPECT_FALSE(p.IsInside(a));
 
 	// On a vertex.
 	a = Point(0, 0);
 	EXPECT_FALSE(p.IsInside(a));
-	a = Point(3, 0);
+	a = Point(30, 0);
 	EXPECT_FALSE(p.IsInside(a));
-	a = Point(3, 2);
+	a = Point(30, 20);
 	EXPECT_FALSE(p.IsInside(a));
-	a = Point(2, 3);
+	a = Point(20, 30);
 	EXPECT_FALSE(p.IsInside(a));
-	a = Point(0, 3);
+	a = Point(0, 30);
 	EXPECT_FALSE(p.IsInside(a));
 
 	// Outside of x range.
-	a = Point(-100, 0);
+	a = Point(-1000, 0);
 	EXPECT_FALSE(p.IsInside(a));
-	a = Point(100, 100);
+	a = Point(1000, 1000);
 	EXPECT_FALSE(p.IsInside(a));
 
 	// Outside above.
-	a = Point(2, 10);
+	a = Point(20, 100);
 	EXPECT_FALSE(p.IsInside(a));
 
 	// Outside below.
-	a = Point(1, -10);
+	a = Point(10, -100);
 	EXPECT_FALSE(p.IsInside(a));
 
 }
@@ -732,9 +664,9 @@ TEST(Polygon, IsInsideWorksAfterClear) {
 	// On a side.
 	a = Point(0, 5);
 	EXPECT_FALSE(p.IsInside(a));
-	a = Point(7.5, 5);
+	a = Point(7, 6);
 	EXPECT_FALSE(p.IsInside(a));
-	a = Point(2.5, 5);
+	a = Point(2, 5);
 	EXPECT_FALSE(p.IsInside(a));
 
 	// Outside.
@@ -805,9 +737,9 @@ TEST(Polygon, IsInsideTriangle) {
 	// On a side.
 	a = Point(0, 5);
 	EXPECT_FALSE(p.IsInside(a));
-	a = Point(7.5, 5);
+	a = Point(7, 6);
 	EXPECT_FALSE(p.IsInside(a));
-	a = Point(2.5, 5);
+	a = Point(2, 4);
 	EXPECT_FALSE(p.IsInside(a));
 
 	// Outside.
@@ -861,50 +793,41 @@ TEST(Polygon, IsInsideOnePoint) {
 
 
 TEST(Polygon, IsInsideBigPolygon) {
-	// Pentagon in 3x3 square
-	// Already provided in counter clockwise order.
+	Polygon p;
 
-	std::vector<Point> main_corners;
-	const int kNumPointsPerSide = 100;
-	const double kCenterDistance = 10000.0;
-
-	main_corners.push_back(Point(0, 1));
-	main_corners.push_back(Point(1, 0));
-	main_corners.push_back(Point(3, 2));
-	main_corners.push_back(Point(2, 3));
-
-	std::vector<int> missing_points;
-
-	Polygon p = GenerateInflatedPolygon(main_corners, kNumPointsPerSide, kCenterDistance, missing_points);
+	p.AddPoint(Point(0, 10));
+	p.AddPoint(Point(10, 0));
+	p.AddPoint(Point(30, 20));
+	p.AddPoint(Point(20, 30));
 
 	Point a;
 
 	// inside points.
-	a = Point(1, 1);
+	a = Point(10, 10);
 	EXPECT_TRUE(p.IsInside(a));
-	a = Point(2, 2);
+	a = Point(20, 20);
 	EXPECT_TRUE(p.IsInside(a));
 
 	// Above.
-	a = Point(0.5, 3);
+	a = Point(5, 30);
 	EXPECT_FALSE(p.IsInside(a));
-	a = Point(1, 3);
+	a = Point(10, 30);
 	EXPECT_FALSE(p.IsInside(a));
-	a = Point(1.5, 3);
+	a = Point(15, 30);
 	EXPECT_FALSE(p.IsInside(a));
 
 	// Below.
-	a = Point(0.5, 0);
+	a = Point(5, 0);
 	EXPECT_FALSE(p.IsInside(a));
-	a = Point(1, 0);
+	a = Point(10, 0);
 	EXPECT_FALSE(p.IsInside(a));
-	a = Point(1.5, 0);
+	a = Point(15, 0);
 	EXPECT_FALSE(p.IsInside(a));
 
 	// Corner point.
-	a = Point(0, 1);
+	a = Point(0, 10);
 	EXPECT_FALSE(p.IsInside(a));
-	a = Point(3, 2);
+	a = Point(30, 20);
 	EXPECT_FALSE(p.IsInside(a));
 }
 
@@ -912,10 +835,10 @@ TEST(Polygon, IsInsideBigPolygon) {
 TEST(polygon, Intersects) {
 	Polygon p;
 	p.AddPoint(Point(0, 0));
-	p.AddPoint(Point(3, 0));
-	p.AddPoint(Point(3, 2));
-	p.AddPoint(Point(2, 3));
-	p.AddPoint(Point(0, 3));
+	p.AddPoint(Point(30, 0));
+	p.AddPoint(Point(30, 20));
+	p.AddPoint(Point(20, 30));
+	p.AddPoint(Point(0, 30));
 
 	Point a;
 	Point b;
@@ -923,93 +846,93 @@ TEST(polygon, Intersects) {
 	// All values checked by hand.
 
 	// Strictly intersects the polygon.
-	a = Point(-1, -1);
-	b = Point(10, 10);
+	a = Point(-10, -10);
+	b = Point(100, 100);
 	EXPECT_TRUE(p.Intersects(Segment(a, b), p.GetTangentIds(a)));
 	EXPECT_TRUE(p.Intersects(Segment(b, a), p.GetTangentIds(b)));
 	// Strictly intersects the polygon.
-	a = Point(2, 0);
-	b = Point(2, 3);
+	a = Point(20, 0);
+	b = Point(20, 30);
 	EXPECT_TRUE(p.Intersects(Segment(a, b), p.GetTangentIds(a)));
 	EXPECT_TRUE(p.Intersects(Segment(b, a), p.GetTangentIds(b)));
 	// Strictly intersects the polygon.
-	a = Point(0, -10);
-	b = Point(2, 100);
+	a = Point(0, -100);
+	b = Point(20, 1000);
 	EXPECT_TRUE(p.Intersects(Segment(a, b), p.GetTangentIds(a)));
 	EXPECT_TRUE(p.Intersects(Segment(b, a), p.GetTangentIds(b)));
 	// Strictly intersects the polygon.
-	a = Point(3, 3);
-	b = Point(-1, 2);
+	a = Point(30, 30);
+	b = Point(-10, 20);
 	EXPECT_TRUE(p.Intersects(Segment(a, b), p.GetTangentIds(a)));
 	EXPECT_TRUE(p.Intersects(Segment(b, a), p.GetTangentIds(b)));
 	// A chord. Strictly intersects the polygon.
-	a = Point(0, 3);
-	b = Point(3, 0);
+	a = Point(0, 30);
+	b = Point(30, 0);
 	EXPECT_TRUE(p.Intersects(Segment(a, b), p.GetTangentIds(a)));
 	EXPECT_TRUE(p.Intersects(Segment(b, a), p.GetTangentIds(b)));
 	// From a vertex outward.
 	a = Point(0, 0);
-	b = Point(-2, -2);
+	b = Point(-20, -20);
 	EXPECT_FALSE(p.Intersects(Segment(a, b), p.GetTangentIds(a)));
 	EXPECT_FALSE(p.Intersects(Segment(b, a), p.GetTangentIds(b)));
 	// From a vertex inward.
 	a = Point(0, 0);
-	b = Point(100, 100);
+	b = Point(1000, 1000);
 	EXPECT_TRUE(p.Intersects(Segment(a, b), p.GetTangentIds(a)));
 	EXPECT_TRUE(p.Intersects(Segment(b, a), p.GetTangentIds(b)));
 	// Far away segment.
-	a = Point(100, 100);
-	b = Point(101, 101);
+	a = Point(1000, 1000);
+	b = Point(1010, 1010);
 	EXPECT_FALSE(p.Intersects(Segment(a, b), p.GetTangentIds(a)));
 	EXPECT_FALSE(p.Intersects(Segment(b, a), p.GetTangentIds(b)));
 	// Parallel to a side.
-	a = Point(5, 1);
-	b = Point(1, 5);
+	a = Point(50, 10);
+	b = Point(10, 50);
 	EXPECT_FALSE(p.Intersects(Segment(a, b), p.GetTangentIds(a)));
 	EXPECT_FALSE(p.Intersects(Segment(b, a), p.GetTangentIds(b)));
 	// Parallel to a side.
-	a = Point(0, -1);
-	b = Point(3, -1);
+	a = Point(0, -10);
+	b = Point(30, -10);
 	EXPECT_FALSE(p.Intersects(Segment(a, b), p.GetTangentIds(a)));
 	EXPECT_FALSE(p.Intersects(Segment(b, a), p.GetTangentIds(b)));
 	// Passes through the side.
-	a = Point(-1, 0);
-	b = Point(4, 0);
+	a = Point(-10, 0);
+	b = Point(40, 0);
 	EXPECT_FALSE(p.Intersects(Segment(a, b), p.GetTangentIds(a)));
 	EXPECT_FALSE(p.Intersects(Segment(b, a), p.GetTangentIds(b)));
 	// Part of a side from vertex
-	a = Point(3, 0);
-	b = Point(1, 0);
+	a = Point(30, 0);
+	b = Point(10, 0);
 	EXPECT_FALSE(p.Intersects(Segment(a, b), p.GetTangentIds(a)));
 	EXPECT_FALSE(p.Intersects(Segment(b, a), p.GetTangentIds(b)));
 	// On continuation of a side, but far away.
-	a = Point(4, 0);
-	b = Point(5, 0);
+	a = Point(40, 0);
+	b = Point(50, 0);
 	EXPECT_FALSE(p.Intersects(Segment(a, b), p.GetTangentIds(a)));
 	EXPECT_FALSE(p.Intersects(Segment(b, a), p.GetTangentIds(b)));
 	// On continuation of a side, but far away.
-	a = Point(0, 4);
-	b = Point(0, 5);
+	a = Point(0, 40);
+	b = Point(0, 50);
 	EXPECT_FALSE(p.Intersects(Segment(a, b), p.GetTangentIds(a)));
 	EXPECT_FALSE(p.Intersects(Segment(b, a), p.GetTangentIds(b)));
 	// On a side, in the middle of it.
-	a = Point(2, 0);
-	b = Point(1, 0);
+	a = Point(20, 0);
+	b = Point(10, 0);
 	EXPECT_FALSE(p.Intersects(Segment(a, b), p.GetTangentIds(a)));
 	EXPECT_FALSE(p.Intersects(Segment(b, a), p.GetTangentIds(b)));
 	// Touches a side with one end.
-	a = Point(2, 0);
-	b = Point(2, -10);
+	a = Point(20, 0);
+	b = Point(20, -100);
 	EXPECT_FALSE(p.Intersects(Segment(a, b), p.GetTangentIds(a)));
 	EXPECT_FALSE(p.Intersects(Segment(b, a), p.GetTangentIds(b)));
 	// Touches a side with one end.
-	a = Point(2.5, 2.5);
-	b = Point(3, 3);
+	a = Point(25, 25);
+	b = Point(30, 30);
 	EXPECT_FALSE(p.Intersects(Segment(a, b), p.GetTangentIds(a)));
 	EXPECT_FALSE(p.Intersects(Segment(b, a), p.GetTangentIds(b)));
 	// Touches the whole side.
-	a = Point(4, 1);
-	b = Point(1, 4);
+	a = Point(40, 10);
+	b = Point(10, 40);
 	EXPECT_FALSE(p.Intersects(Segment(a, b), p.GetTangentIds(a)));
 	EXPECT_FALSE(p.Intersects(Segment(b, a), p.GetTangentIds(b)));
 }
@@ -1116,95 +1039,95 @@ TEST(PathFinder, OnePolygon) {
 TEST(PathFinder, OnePolygonTwoPoints) {
 	Polygon p;
 	p.AddPoint(0, 0);
-	p.AddPoint(1, 0);
-	p.AddPoint(0, 1);
+	p.AddPoint(10, 0);
+	p.AddPoint(0, 10);
 	PathFinder pf;
 	pf.AddPolygons({ p }, 0);
 	// Points obstructed by the polygon.
-	pf.AddExternalPoints({ Point{1, 1}, Point(-1,-1) });
+	pf.AddExternalPoints({ Point{10, 10}, Point(-10,-10) });
 	std::vector<Segment> edges = pf.GetEdgesForDebug();
 
 	ASSERT_EQ(edges.size(), 7);
-	EXPECT_EDGE(edges, Segment(Point(0, 0), Point(0, 1)));
-	EXPECT_EDGE(edges, Segment(Point(0, 1), Point(1, 0)));
-	EXPECT_EDGE(edges, Segment(Point(1, 0), Point(0, 0)));
+	EXPECT_EDGE(edges, Segment(Point(0, 0), Point(0, 10)));
+	EXPECT_EDGE(edges, Segment(Point(0, 10), Point(10, 0)));
+	EXPECT_EDGE(edges, Segment(Point(10, 0), Point(0, 0)));
 
-	EXPECT_EDGE(edges, Segment(Point(1, 1), Point(0, 1)));
-	EXPECT_EDGE(edges, Segment(Point(1, 1), Point(1, 0)));
+	EXPECT_EDGE(edges, Segment(Point(10, 10), Point(0, 10)));
+	EXPECT_EDGE(edges, Segment(Point(10, 10), Point(10, 0)));
 
-	EXPECT_EDGE(edges, Segment(Point(-1, -1), Point(0, 1)));
-	EXPECT_EDGE(edges, Segment(Point(-1, -1), Point(1, 0)));
+	EXPECT_EDGE(edges, Segment(Point(-10, -10), Point(0, 10)));
+	EXPECT_EDGE(edges, Segment(Point(-10, -10), Point(10, 0)));
 
 	// Points not obstructed by the polygon.
 	// Also checks that consecutive calls to AddExternalPoints clear the map.
-	pf.AddExternalPoints({ Point{1, 1}, Point(2,2) });
+	pf.AddExternalPoints({ Point{10, 10}, Point(20, 20) });
 	edges = pf.GetEdgesForDebug();
 
 	ASSERT_EQ(edges.size(), 8);
-	EXPECT_EDGE(edges, Segment(Point(0, 0), Point(0, 1)));
-	EXPECT_EDGE(edges, Segment(Point(0, 1), Point(1, 0)));
-	EXPECT_EDGE(edges, Segment(Point(1, 0), Point(0, 0)));
+	EXPECT_EDGE(edges, Segment(Point(0, 0), Point(0, 10)));
+	EXPECT_EDGE(edges, Segment(Point(0, 10), Point(10, 0)));
+	EXPECT_EDGE(edges, Segment(Point(10, 0), Point(0, 0)));
 
-	EXPECT_EDGE(edges, Segment(Point(1, 1), Point(0, 1)));
-	EXPECT_EDGE(edges, Segment(Point(1, 1), Point(1, 0)));
+	EXPECT_EDGE(edges, Segment(Point(10, 10), Point(0, 10)));
+	EXPECT_EDGE(edges, Segment(Point(10, 10), Point(10, 0)));
 
-	EXPECT_EDGE(edges, Segment(Point(2, 2), Point(0, 1)));
-	EXPECT_EDGE(edges, Segment(Point(2, 2), Point(1, 0)));
+	EXPECT_EDGE(edges, Segment(Point(20, 20), Point(0, 10)));
+	EXPECT_EDGE(edges, Segment(Point(20, 20), Point(10, 0)));
 
-	EXPECT_EDGE(edges, Segment(Point(2, 2), Point(1, 1)));
+	EXPECT_EDGE(edges, Segment(Point(20, 20), Point(10, 10)));
 
 	// One point inside the polygon.
 	// Also checks that consecutive calls to AddExternalPoints clear the map.
-	pf.AddExternalPoints({ Point{1, 1}, Point(0.25, 0.25) });
+	pf.AddExternalPoints({ Point{10, 10}, Point(3, 3) });
 	edges = pf.GetEdgesForDebug();
 
 	ASSERT_EQ(edges.size(), 5);
-	EXPECT_EDGE(edges, Segment(Point(0, 0), Point(0, 1)));
-	EXPECT_EDGE(edges, Segment(Point(0, 1), Point(1, 0)));
-	EXPECT_EDGE(edges, Segment(Point(1, 0), Point(0, 0)));
+	EXPECT_EDGE(edges, Segment(Point(0, 0), Point(0, 10)));
+	EXPECT_EDGE(edges, Segment(Point(0, 10), Point(10, 0)));
+	EXPECT_EDGE(edges, Segment(Point(10, 0), Point(0, 0)));
 
-	EXPECT_EDGE(edges, Segment(Point(1, 1), Point(0, 1)));
-	EXPECT_EDGE(edges, Segment(Point(1, 1), Point(1, 0)));
+	EXPECT_EDGE(edges, Segment(Point(10, 10), Point(0, 10)));
+	EXPECT_EDGE(edges, Segment(Point(10, 10), Point(10, 0)));
 
 	// Both points inside the polygon.
 	// Also checks that consecutive calls to AddExternalPoints clear the map.
-	pf.AddExternalPoints({ Point{0.15, 0.15}, Point(0.25, 0.25) });
+	pf.AddExternalPoints({ Point{2, 2}, Point(3, 3) });
 	edges = pf.GetEdgesForDebug();
 
 	ASSERT_EQ(edges.size(), 3);
-	EXPECT_EDGE(edges, Segment(Point(0, 0), Point(0, 1)));
-	EXPECT_EDGE(edges, Segment(Point(0, 1), Point(1, 0)));
-	EXPECT_EDGE(edges, Segment(Point(1, 0), Point(0, 0)));
+	EXPECT_EDGE(edges, Segment(Point(0, 0), Point(0, 10)));
+	EXPECT_EDGE(edges, Segment(Point(0, 10), Point(10, 0)));
+	EXPECT_EDGE(edges, Segment(Point(10, 0), Point(0, 0)));
 }
 
 TEST(PathFinder, AllowsTouchingEdgesButNotIntersecting) {
 	Polygon p;
 	p.AddPoint(0, 0);
-	p.AddPoint(1, 0);
-	p.AddPoint(0, 1);
+	p.AddPoint(10, 0);
+	p.AddPoint(0, 10);
 	PathFinder pf;
 	pf.AddPolygons({ p }, 0);
 	// Points obstructed by the polygon.
-	pf.AddExternalPoints({ Point{1, 1}, Point(1,-2), Point(-2, 1), Point(-1, 0), Point(10, 0), Point(0.5, 0.5) });
+	pf.AddExternalPoints({ Point{10, 10}, Point(10, -20), Point(-20, 10), Point(-10, 0), Point(100, 0), Point(5, 5) });
 
 	std::vector<Segment> edges = pf.GetEdgesForDebug();
 	// Touching corner.
-	EXPECT_EDGE(edges, Segment(Point(1, 1), Point(1, -2)));
-	EXPECT_EDGE(edges, Segment(Point(1, 1), Point(-2, 1)));
+	EXPECT_EDGE(edges, Segment(Point(10, 10), Point(10, -20)));
+	EXPECT_EDGE(edges, Segment(Point(10, 10), Point(-20, 10)));
 	// On the corner.
-	EXPECT_EDGE(edges, Segment(Point(1, 1), Point(0, 1)));
-	EXPECT_EDGE(edges, Segment(Point(1, 1), Point(1, 0)));
+	EXPECT_EDGE(edges, Segment(Point(10, 10), Point(0, 10)));
+	EXPECT_EDGE(edges, Segment(Point(10, 10), Point(10, 0)));
 	// touching side.
-	EXPECT_EDGE(edges, Segment(Point(1, 1), Point(0.5, 0.5)));
+	EXPECT_EDGE(edges, Segment(Point(10, 10), Point(5, 5)));
 	// Form point on side.
-	EXPECT_EDGE(edges, Segment(Point(1, 0), Point(0.5, 0.5)));
-	EXPECT_EDGE(edges, Segment(Point(0, 1), Point(0.5, 0.5)));
+	EXPECT_EDGE(edges, Segment(Point(10, 0), Point(5, 5)));
+	EXPECT_EDGE(edges, Segment(Point(0, 10), Point(5, 5)));
 
 	//Sweeping side.
-	EXPECT_EDGE(edges, Segment(Point(-1, 0), Point(10, 0)));
+	EXPECT_EDGE(edges, Segment(Point(-10, 0), Point(100, 0)));
 
 	// Intersecting
-	EXPECT_NO_EDGE(edges, Segment(Point(-1, 0), Point(1, 1)));
+	EXPECT_NO_EDGE(edges, Segment(Point(-10, 0), Point(10, 10)));
 }
 
 
@@ -1229,44 +1152,44 @@ TEST(PathFinder, CanPassBetweenTwoTouchingSides) {
 TEST(PathFinder, CanPassBetweenTwoTouchingCorner) {
 	Polygon p;
 	p.AddPoint(0, 0);
-	p.AddPoint(1, 0);
-	p.AddPoint(0, 1);
+	p.AddPoint(10, 0);
+	p.AddPoint(0, 10);
 	Polygon p2;
-	p2.AddPoint(0.5, 0);
-	p2.AddPoint(0, -1);
-	p2.AddPoint(1, -1);
+	p2.AddPoint(5, 0);
+	p2.AddPoint(0, -10);
+	p2.AddPoint(10, -10);
 
 	PathFinder pf;
 	pf.AddPolygons({ p, p2 }, 0);
 
 	std::vector<Segment> edges = pf.GetEdgesForDebug();
 	// Side with a corner on it.
-	EXPECT_EDGE(edges, Segment(Point(0, 0), Point(0, 1)));
+	EXPECT_EDGE(edges, Segment(Point(0, 0), Point(0, 10)));
 	// Can switch from one polygon to another.
-	EXPECT_EDGE(edges, Segment(Point(0, 0), Point(0.5, 0)));
-	EXPECT_EDGE(edges, Segment(Point(1, 0), Point(0.5, 0)));
+	EXPECT_EDGE(edges, Segment(Point(0, 0), Point(5, 0)));
+	EXPECT_EDGE(edges, Segment(Point(10, 0), Point(5, 0)));
 }
 
 TEST(PathFinder, CantPassThroughIntersection) {
 	Polygon p;
 	p.AddPoint(0, 0);
-	p.AddPoint(1, 0);
-	p.AddPoint(0, 1);
+	p.AddPoint(10, 0);
+	p.AddPoint(0, 10);
 	Polygon p2;
-	p2.AddPoint(0.25, 0.25);
-	p2.AddPoint(0, -1);
-	p2.AddPoint(1, -1);
+	p2.AddPoint(3, 3);
+	p2.AddPoint(0, -10);
+	p2.AddPoint(10, -10);
 
 	PathFinder pf;
 	pf.AddPolygons({ p, p2 }, 0);
 
 	std::vector<Segment> edges = pf.GetEdgesForDebug();
 	// Side with a corner on it.
-	EXPECT_NO_EDGE(edges, Segment(Point(0, 0), Point(1, 0)));
+	EXPECT_NO_EDGE(edges, Segment(Point(0, 0), Point(10, 0)));
 	// Can switch from one polygon to another.
-	EXPECT_NO_EDGE(edges, Segment(Point(0, 0), Point(0.25, 0.25)));
-	EXPECT_NO_EDGE(edges, Segment(Point(0, 1), Point(0.25, 0.25)));
-	EXPECT_NO_EDGE(edges, Segment(Point(1, 0), Point(0.25, 0.25)));
+	EXPECT_NO_EDGE(edges, Segment(Point(0, 0), Point(3, 3)));
+	EXPECT_NO_EDGE(edges, Segment(Point(0, 10), Point(3, 3)));
+	EXPECT_NO_EDGE(edges, Segment(Point(10, 0), Point(3, 3)));
 }
 
 
