@@ -20,16 +20,12 @@ namespace NavMesh {
 		//
 		// |polygons_to_add| - convex polygons on the map.
 		// |inflate_by| - how far away paths must go from any polygon
-		// |use_rtree| - use Rtree to heuristically exclude polygons while building
-		// the graph. It's worse for low volume of polygons or if polygons are
-		// randomly and uniformly distributed on the map. It's better
-		// if there's some structure on the map and polygons are clustered.
 		void AddPolygons(const std::vector<Polygon>& polygons_to_add, int inflate_by);
 		
 		// Call any time after AddPolygons().
 		// It removes previously added external points and adds
 		// |points| to the graph.
-	    void AddExternalPoints(const std::vector<Point>& points_);
+	  void AddExternalPoints(const std::vector<Point>& points_);
 
 		// Get shortest path between two points.
 		// points must be first added via AddExternalPoints().
@@ -38,9 +34,6 @@ namespace NavMesh {
 		// For debugging. Returns all the edges in the graph.
 		std::vector<Segment> GetEdgesForDebug() const;
 	private:
-
-		bool use_rtree_ = true;
-
 		int GetVertex(const Point& c);
 		void AddEdge(int be, int en);
 		bool CanAddSegment(const Segment& s, const std::vector<std::pair<int, int>>& tangents);

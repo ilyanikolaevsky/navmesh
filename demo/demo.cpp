@@ -92,7 +92,7 @@ void GenerateCircles() {
 		int x = 30 + rand() % 1000;
 		int y = 30 + rand() % 600;
 		for (int j = 0; j < K; ++j) {
-			p.AddPoint(x + cos(2 * M_PI * j / K) * 30, y + sin(2 * M_PI * j / K) * 30);
+			p.AddPoint(x + (int)cos(2 * M_PI * j / K) * 30, y + (int)sin(2 * M_PI * j / K) * 30);
 		}
 		polygons.push_back(p);
 	}
@@ -157,7 +157,7 @@ void Benchmark() {
 	const int kIterations = 500;
 	for (int i = 0; i < kIterations; ++i) {
 		GeneratePolygons();
-		path_finder.AddPolygons(polygons, inflate ? 10.0 : 0.0);
+		path_finder.AddPolygons(polygons, inflate ? 10 : 0);
 		path_finder.AddExternalPoints({ source_coordinates, dest_coordinates });
 	}
 	auto geo_done_time = std::chrono::high_resolution_clock::now();
@@ -213,7 +213,7 @@ VOID OnPaint(HDC hdc)
 
 	// Update the map if needed.
 	if (polygons_changed) {
-		path_finder.AddPolygons(polygons, inflate ? 10.0 : 0.0);
+		path_finder.AddPolygons(polygons, inflate ? 10 : 0);
 		polygons_changed = false;
 	}
 	// Update source and destination.

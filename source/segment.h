@@ -7,7 +7,7 @@ namespace NavMesh {
 	class Segment
 	{
 	public:
-		Segment() : b(0.0, 0.0), e(0.0, 0.0) {}
+		Segment() : b(0, 0), e(0, 0) {}
 		Segment(Point b, Point e) : b(b), e(e) {}
 
 		// Check for intersection with segment |a|-|b|.

@@ -34,14 +34,14 @@ TEST(Point, VectorMultiplication) {
 }
 
 TEST(Point, Scaling) {
-	EXPECT_EQ(Point(10, 1) * 2.0, Point(20, 2));
+	EXPECT_EQ(Point(10, 1) * 2, Point(20, 2));
 }
 
 TEST(Point, OperationsConsistent) {
 	Point a(1, 6);
 	Point b(3, 15);
 	Point c(18, -5);
-	double k = 5.0;
+	int k = 5;
 	EXPECT_EQ((a - b) * c, a * c - b * c);
 	EXPECT_EQ((a - b) * k, a * k - b * k);
 	EXPECT_EQ((a - b) ^ c, (a ^ c) - (b ^ c));
@@ -488,7 +488,7 @@ TEST(Polygon, InflateOnePoint) {
 	Polygon p;
 	Point o(0, 0);
 	p.AddPoint(o);
-	float kInflationDistance = 10.0;
+	int kInflationDistance = 10;
 	Polygon res = p.Inflate(kInflationDistance);
 	ASSERT_EQ(res.Size(), 4);
 
@@ -515,7 +515,7 @@ TEST(Polygon, InflateSegment) {
 	Polygon p;
 	p.AddPoint(100, 304);
 	p.AddPoint(108, 254);
-	float kInflationDistance = 10.0;
+	int kInflationDistance = 10;
 	const int kExpectedNumPoints = 6;
 	Polygon res = p.Inflate(kInflationDistance);
 	ASSERT_EQ(res.Size(), kExpectedNumPoints);
@@ -542,7 +542,7 @@ TEST(Polygon, InflateTriangle) {
 	p.AddPoint(100, 304);
 	p.AddPoint(108, 254);
 	p.AddPoint(50, 101);
-	float kInflationDistance = 10.0;
+	int kInflationDistance = 10;
 	const int kExpectedNumPoints = 7;
 	Polygon res = p.Inflate(kInflationDistance);
 	ASSERT_EQ(res.Size(), kExpectedNumPoints);

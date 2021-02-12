@@ -11,12 +11,12 @@ namespace NavMesh {
 	}
 
 	// Scalar multiplication.
-	double Point::operator*(const Point& other) const {
+	long long Point::operator*(const Point& other) const {
 		return (long long)x * other.x + (long long)y * other.y;
 	}
 
 	// Pointtor multiplication.
-	double Point::operator^(const Point& other) const {
+	long long Point::operator^(const Point& other) const {
 		return (long long)x * other.y - (long long)y * other.x;
 	}
 
