@@ -233,10 +233,10 @@ namespace NavMesh {
 			return it->second;
 		}
 		if (free_vertices_.empty()) {
-			vertex_ids_[c] = v_.size();
+			vertex_ids_[c] = (int)v_.size();
 			v_.push_back(c);
 			edges_.push_back({});
-			return v_.size() - 1;
+			return (int)v_.size() - 1;
 		}
 		else {
 			int node = free_vertices_.back();

@@ -59,7 +59,7 @@ namespace NavMesh {
 			return;
 		}
 
-		// Remove ponits, which will be inside the convex hull.
+		// Remove points, which will be inside the convex hull.
 		// Find tangents from the newly added point and make them
 		// two new sides, removing all points inside.
 
@@ -78,8 +78,6 @@ namespace NavMesh {
 			Point v2 = points_[i2] - a;
 			if ((v1 ^ v2) == 0 && v1 * v2 <= 0) return;
 		}
-
-		int n = points_.size();
 
 		// Erase points from i1+1 to i2-1 inclusive and wrapping.
 		int insert_to = 0;
@@ -104,7 +102,7 @@ namespace NavMesh {
 		}
 		points_.resize(points_.size() + 1);
 		// Shift points right by 1 to make a place for |a|.
-		for (int i = points_.size() - 1; i > insert_to + 1; --i) {
+		for (size_t i = points_.size() - 1; i > insert_to + 1; --i) {
 			points_[i] = points_[i - 1];
 		}
 		points_[insert_to + 1] = a;
@@ -136,7 +134,7 @@ namespace NavMesh {
 		}
 
 		// Previous entry is smaller or equal than |a.x|.
-		int i = it - xs_.begin() - 1;
+		long long i = it - xs_.begin() - 1;
 		const auto& top = top_lines_[i];
 		const auto& bottom = bottom_lines_[i];
 		// Plug a.x into y=k*x+b of the lines to get at
@@ -170,7 +168,7 @@ namespace NavMesh {
 		long long r_dir;
 
 		if (tangents.first == tangents.second) {
-			int n = points_.size();
+			int n = (int)points_.size();
 			// One end is a vertex of the polygon.
 			// Intersection only if the vector is 
 			// strictly between two sides.
@@ -327,7 +325,7 @@ namespace NavMesh {
 		}
 
 		// Remove points on sides or concave direction.
-		int n = points_.size();
+		int n = (int)points_.size();
 		std::vector<bool> bad_point(n);
 		for (int i = 0; i < n; ++i) {
 			Point v1 = points_[i] - points_[(i - 1 + n) % n];
@@ -354,7 +352,7 @@ namespace NavMesh {
 	std::pair<int, int> Polygon::GetTangentIdsNaive(const Point& a) const
 	{
 		std::pair<int, int> res = { -1, -1 };
-		const int n = points_.size();
+		const int n = (int)points_.size();
 		if (n == 1) {
 			return { 0, 0 };
 		}
@@ -447,7 +445,7 @@ namespace NavMesh {
 	std::pair<int, int> Polygon::GetTangentIdsLogarithmic(const Point& a) const
 	{
 		std::pair<int, int> res = { -1, -1 };
-		const int n = points_.size();
+		const int n = (int)points_.size();
 
 		// Value of the point i is (point[i] - a) ^ (point[i+1] - point[i]).
 		// It is positive, if the side rotates counter-clockwise from the segment a-point[i].
@@ -657,7 +655,7 @@ namespace NavMesh {
 
 	bool Polygon::IsTangent(int i, const Point& a) const
 	{
-		int n = points_.size();
+		int n = (int)points_.size();
 		Point v1 = points_[i] - points_[(i + n - 1) % n];
 		Point v = a - points_[i];
 		Point v2 = points_[(i + 1) % n] - points_[i];

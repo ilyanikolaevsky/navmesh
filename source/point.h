@@ -13,10 +13,10 @@ namespace NavMesh {
 		Point operator-(const Point& other) const;
 
 		// Scalar multiplication.
-		double operator*(const Point& other) const;
+		long long operator*(const Point& other) const;
 
 		// Pointtor multiplication.
-		double operator^(const Point& other) const;
+		long long operator^(const Point& other) const;
 
 		// Scale by k.
 		Point operator*(int k)	const;
