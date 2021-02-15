@@ -19,7 +19,7 @@ namespace NavMesh {
 		long long operator^(const Point& other) const;
 
 		// Scale by k.
-		Point operator*(int k)	const;
+		Point operator*(int k) const;
 
 		bool operator==(const Point& other) const;
 		bool operator!=(const Point& other) const;

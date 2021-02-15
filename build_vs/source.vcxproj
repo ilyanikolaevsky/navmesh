@@ -23,12 +23,15 @@
     <ClCompile Include="..\source\point.cpp" />
     <ClCompile Include="..\source\polygon.cpp" />
     <ClCompile Include="..\source\segment.cpp" />
+    <ClCompile Include="..\source\cone_of_vision.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\path_finder.h" />
     <ClInclude Include="..\source\point.h" />
+    <ClInclude Include="..\source\pointf.h" />
     <ClInclude Include="..\source\polygon.h" />
     <ClInclude Include="..\source\segment.h" />
+    <ClInclude Include="..\source\cone_of_vision.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

@@ -27,6 +27,9 @@
     <ClCompile Include="..\source\segment.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\cone_of_vision.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\path_finder.h">
@@ -35,10 +38,16 @@
     <ClInclude Include="..\source\point.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\source\pointf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\source\polygon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\source\segment.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cone_of_vision.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

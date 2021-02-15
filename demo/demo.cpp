@@ -5,6 +5,7 @@
 #include "segment.h"
 #include "polygon.h"
 #include "path_finder.h"
+#include "cone_of_vision.h"
 
 #include <windows.h>
 #include <windowsx.h>
@@ -63,6 +64,9 @@ NavMesh::Point dest_coordinates(1000, 300);
 
 // Current cursor position, updated continuously.
 NavMesh::Point cursor_position;
+
+
+NavMesh::ConeOfVision cone_of_vision;
 
 
 NavMesh::PathFinder path_finder;
@@ -214,6 +218,7 @@ VOID OnPaint(HDC hdc)
 	// Update the map if needed.
 	if (polygons_changed) {
 		path_finder.AddPolygons(polygons, inflate ? 10 : 0);
+		cone_of_vision.AddPolygons(polygons);
 		polygons_changed = false;
 	}
 	// Update source and destination.
@@ -222,6 +227,9 @@ VOID OnPaint(HDC hdc)
 	auto geo_done_time = std::chrono::high_resolution_clock::now();
 
 	std::vector<NavMesh::Point> path = path_finder.GetPath(source_coordinates, dest_coordinates);
+	// this is not intendent to call on every frame, but usually only when input variables changed
+	// but for demo it is OK
+	std::vector<NavMesh::PointF> vision = cone_of_vision.GetVision(source_coordinates, 100);
 
 	auto end_time = std::chrono::high_resolution_clock::now();
 
@@ -239,6 +247,11 @@ VOID OnPaint(HDC hdc)
 	// everything else.
 	for (size_t i = 0; i + 1 < path.size(); ++i) {
 		DrawSegment(NavMesh::Segment(path[i], path[i + 1]), graphics, pen_red);
+	}
+
+	// Draw cone of vision
+	for (size_t i = 0; i + 1 < vision.size(); ++i) {
+		DrawSegment(NavMesh::Segment((NavMesh::Point)vision[i], (NavMesh::Point)vision[i + 1]), graphics, pen_black);
 	}
 
 	// Draw endpoints as circles so they would be visible.
