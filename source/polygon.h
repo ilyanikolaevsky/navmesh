@@ -46,7 +46,7 @@ namespace NavMesh {
 		// Removes all points.
 		void Clear();
 
-		// Retruns corresponding point.
+		// Returns corresponding point.
 		// No boundary checks are made.
 		const Point& operator[](size_t i) const;
 

@@ -1,9 +1,11 @@
 #include "gtest/gtest.h"
 
 #include "point.h"
+#include "pointf.h"
 #include "segment.h"
 #include "polygon.h"
 #include "path_finder.h"
+#include "cone_of_vision.h"
 
 #include <vector>
 
@@ -96,6 +98,11 @@ TEST(Segment, Intersects) {
 	s2 = Segment(Point(5, 0), Point(15, 0));
 	EXPECT_FALSE(s1.Intersects(s2.b, s2.e));
 	EXPECT_FALSE(s2.Intersects(s1.b, s1.e));
+}
+
+TEST(Segment, GetIntersection) {
+	Segment s1(Point(0, 10), Point(10, 10));
+	EXPECT_EQ(Point(5, 10), (Point)s1.GetIntersection(Point(5, 0), Point(5, 15)));
 }
 
 TEST(Polygon, ConstructsConvexHullOnAddedPoints) {
@@ -1217,4 +1224,20 @@ TEST(PathFinder, BuildsAllTangents) {
 	EXPECT_NO_EDGE(edges, Segment(Point(-5, 2), Point(7, 8)));
 	EXPECT_NO_EDGE(edges, Segment(Point(7, 8), Point(3, 8)));
 	EXPECT_NO_EDGE(edges, Segment(Point(3, 8), Point(-5, 2)));
+}
+
+TEST(ConeOfVision, GetVision) {
+	ConeOfVision cov;
+
+	std::vector<PointF> v1 = cov.GetVision(Point(0, 0), 100);
+	EXPECT_EQ(v1.size(), 360);
+
+	std::vector<PointF> v2 = cov.GetVision(Point(0, 0), 100, 180);
+	EXPECT_EQ(v2.size(), 180);
+
+	std::vector<PointF> v3 = cov.GetVision(Point(0, 0), 100, 180, 0);
+	EXPECT_EQ(v3.size(), 180);
+
+	std::vector<PointF> v4 = cov.GetVision(Point(0, 0), 100, 180, 0, 2);
+	EXPECT_EQ(v4.size(), 90);
 }

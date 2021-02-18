@@ -1,22 +1,27 @@
 #include "Point.h"
-#include "cmath"
+#include <cmath>
 
 namespace NavMesh {
 
-	Point Point::operator+(const Point& other) const {
+	Point Point::operator+(const Point& other) const 
+	{
 		return Point(x + other.x, y + other.y);
 	}
-	Point Point::operator-(const Point& other) const {
+
+	Point Point::operator-(const Point& other) const 
+	{
 		return Point(x - other.x, y - other.y);
 	}
 
 	// Scalar multiplication.
-	long long Point::operator*(const Point& other) const {
+	long long Point::operator*(const Point& other) const 
+	{
 		return (long long)x * other.x + (long long)y * other.y;
 	}
 
 	// Pointtor multiplication.
-	long long Point::operator^(const Point& other) const {
+	long long Point::operator^(const Point& other) const 
+	{
 		return (long long)x * other.y - (long long)y * other.x;
 	}
 
@@ -40,7 +45,6 @@ namespace NavMesh {
 		return x < other.x || (x  == other.x && y < other.y);
 	}
 
-
 	double Point::Len() const
 	{
 		return sqrt(static_cast<double>(x) * x + static_cast<double>(y) * y);
@@ -50,6 +54,5 @@ namespace NavMesh {
 	{
 		return static_cast<long long>(x) * x + static_cast<long long>(y) * y;
 	}
-
 
 }
