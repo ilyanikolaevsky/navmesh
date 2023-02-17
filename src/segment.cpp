@@ -1,5 +1,5 @@
-#include "segment.h"
-#include "pointf.h"
+#include "navmesh/segment.h"
+#include "navmesh/pointf.h"
 
 namespace NavMesh {
 

@@ -1,4 +1,4 @@
-#include "polygon.h"
+#include "navmesh/polygon.h"
 
 #include <algorithm>
 

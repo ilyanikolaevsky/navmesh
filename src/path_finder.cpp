@@ -1,4 +1,4 @@
-#include "path_finder.h"
+#include "navmesh/path_finder.h"
 
 #include <queue>
 #include <algorithm>

@@ -1,4 +1,4 @@
-#include "point.h"
+#include "navmesh/point.h"
 #include <cmath>
 
 namespace NavMesh {

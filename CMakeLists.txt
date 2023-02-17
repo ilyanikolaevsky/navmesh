@@ -24,12 +24,13 @@ foreach(flag_var
   endif()
 endforeach()
 
-include_directories(source)
+add_subdirectory(src)
 
-enable_testing()
-add_subdirectory(third_party)
-add_subdirectory(source)
-add_subdirectory(tests)
+include(CTest)
+if (BUILD_TESTING)
+  add_subdirectory(test)
+endif()
+
 if (CMAKE_GENERATOR MATCHES "Visual Studio")
   add_subdirectory(demo)
 endif()
