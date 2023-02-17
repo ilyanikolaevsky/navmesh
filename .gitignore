@@ -4,3 +4,4 @@ benchmark
 Release
 Debug
 *.aps
+build/
