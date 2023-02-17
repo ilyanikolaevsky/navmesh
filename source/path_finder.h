@@ -7,7 +7,7 @@
 
 #include "point.h"
 #include "polygon.h"
-#include "Segment.h"
+#include "segment.h"
 
 
 namespace NavMesh {

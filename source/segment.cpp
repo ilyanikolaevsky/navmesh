@@ -1,4 +1,4 @@
-#include "Segment.h"
+#include "segment.h"
 #include "pointf.h"
 
 namespace NavMesh {
