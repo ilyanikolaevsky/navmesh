@@ -1,13 +1,13 @@
 # NavMesh
 
-This is a little and fast library for pathfinding in 2D space around convex-polygonal obstacles. This may be useful in GameDev.
-The implementation can walk around the obstacles at a given distance (if the actor is not a zero-width point, but has some physical size).
-The poeject also contains a little demo.
+This is a small and fast library for pathfinding in 2D space around convex polygonal obstacles. This may be useful in GameDev.
+The implementation can pass around the obstacles at a given distance (if the actor is not a zero-width point, but has some physical size).
+The project also contains a little demo.
 
 ![Example of the demo output](https://github.com/ilyanikolaevsky/navmesh/blob/master/picture.png?raw=true)
 
 
-The main feature of this library is it's speed: for a moderate amount (100) of quite big polygons (20 points each) the library computes
+The main feature of this library is its speed: for a moderate amount (100) of quite big polygons (20 points each) the library computes
 everything in 7-8ms on a i7-6700k CPU. It doesn't require baking in the graph around the geometry, which allows compeletely dynamic geometry of the map.
 
 ## Usage
@@ -15,34 +15,34 @@ everything in 7-8ms on a i7-6700k CPU. It doesn't require baking in the graph ar
 You need to include ``path_finder.h``, ``point.h``, ``segment.h``, ``polygon.h`` files in your project and link against the static library.
 Alternatively, since it's a small project, you can just add all files from ``source/`` to your project.
 
-The main class is ``NavMesh::PathFinder``. There are also ``NavMesh::Point``, ``NavMesh::Segment`` and ``NavMesh::Polygon`` for geometrical logic.
+The main class is ``NavMesh::PathFinder``. There are also ``NavMesh::Point``, ``NavMesh::Segment`` and ``NavMesh::Polygon`` for geometric logic.
 
 ``PathFinder::AddPolygons`` should be called each time the map changes.
 This is the slowest one, which takes ``O(n^3*k)`` time, where ``n``in the number of polygons, and ``k`` is average number of points in each.
-This method consumes ``O(n^2*k)`` memory in the worst case (usually much less, as most of edges are not valid due to intersections).
+This method consumes ``O(n^2*k)`` memory in the worst case (usually much less, as most of the edges are not valid due to intersections).
 Ideally, it should be called only if the map is updated.
 
-``PathFinder::AddExternalPoints`` should be called afterh ``AddPolygons`` each time coordinates of external points change.
+``PathFinder::AddExternalPoints`` should be called after ``AddPolygons`` each time coordinates of external points change.
 This method takes ``O(p*n^2)`` time and consumes ``O(n*p)`` memory, where ``p`` is the number of points added.
 
-``PathFinder::FindPath`` should be called each time you need a path between two points. The points must be on of the external points.
+``PathFinder::FindPath`` should be called each time you need a path between two points. The points must be one of the external points.
 This method takes ``O((n*k+p)*n*log(n*k+p))`` time and uses ``O((n+p)*n)`` memory.
 
 
 ## Details
 
-This project constructs the graph around obstacles, using polygon sides and tangents to polygons as edges in the graph. 
+This project constructs the visibility graph around obstacles using polygon sides and tangents to polygons as edges in the graph.
 Then it uses A* on the constructed graph to find the shortest path. This implementation takes 8ms to construct the graph with 100 polygons with upto 20 points each on i7-6700k CPU. 
-The path calulations on the graph take negligibaly small amout of time - most computations are spent on constructing the graph.
+The path finding on the graph take negligibly small amout of time - most computations are spent on constructing the graph.
 Already computed tangents are reused to check for intersections of potential edges and obstacles in O(1). A fast logarithmic method is used for checking if points are inside an obstacle and for tangents construction.
 
 ## Code structure
 ``source/`` directory contains the library, ``tests/`` directory contains tests and ``demo/`` directory contains a simple Windows demo application.
 ``point.cpp``, ``segment.cpp``, and ``polygon.cpp`` contain geometry primitives with necessary logic implemented on them.
-``path_finder.cpp`` has main class, which invoces geometry calculations, constructs the graph and uses A* to find the path between two given points.
+``path_finder.cpp`` contains the main class, which invokes geometry calculations, constructs the graph and uses A* to find the path between two given points.
 
 ## Demo
-A demo is a simple windows GUI application. It uses GDI+ to draw obstacles and the found path, as well as outputting some statistics.
+A demo is a simple windows GUI application. It uses GDI+ to draw obstacles and the path around them, as well as outputting some statistics.
 The user interaction is mostly happening through the menu. Following items are available:
 
 * Polygon
