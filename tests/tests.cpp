@@ -831,7 +831,7 @@ TEST(Polygon, IsInsideBigPolygon) {
 }
 
 
-TEST(polygon, Intersects) {
+TEST(Polygon, Intersects) {
 	Polygon p;
 	p.AddPoint(Point(0, 0));
 	p.AddPoint(Point(30, 0));
@@ -936,7 +936,7 @@ TEST(polygon, Intersects) {
 	EXPECT_FALSE(p.Intersects(Segment(b, a), p.GetTangentIds(b)));
 }
 
-TEST(polygon, IntersectsPoint) {
+TEST(Polygon, IntersectsPoint) {
 	Polygon p;
 	p.AddPoint(Point(0, 0));
 
@@ -959,7 +959,7 @@ TEST(polygon, IntersectsPoint) {
 	EXPECT_FALSE(p.Intersects(Segment(b, a), p.GetTangentIds(b)));
 }
 
-TEST(polygon, IntersectsSegment) {
+TEST(Polygon, IntersectsSegment) {
 	Polygon p;
 	p.AddPoint(Point(0, 0));
 	p.AddPoint(Point(10, 0));
@@ -1148,7 +1148,7 @@ TEST(PathFinder, CanPassBetweenTwoTouchingSides) {
 	EXPECT_EDGE(edges, Segment(Point(0, 0), Point(0, 1)));
 }
 
-TEST(PathFinder, CanPassBetweenTwoTouchingCorner) {
+TEST(PathFinder, CanPassBetweenTwoTouchingCorners) {
 	Polygon p;
 	p.AddPoint(0, 0);
 	p.AddPoint(10, 0);
@@ -1227,7 +1227,7 @@ TEST(PathFinder, BuildsAllTangents) {
 	EXPECT_NO_EDGE(edges, Segment(Point(3, 8), Point(-5, 2)));
 }
 
-TEST(ConeOfVision, GetVision) {
+TEST(ConeOfVision, GetsVision) {
 	ConeOfVision cov;
 
 	std::vector<PointF> v1 = cov.GetVision(Point(0, 0), 100);
