@@ -1,11 +1,11 @@
 #include "gtest/gtest.h"
 
-#include "navmesh/point.h"
-#include "navmesh/pointf.h"
-#include "navmesh/segment.h"
-#include "navmesh/polygon.h"
-#include "navmesh/path_finder.h"
-#include "navmesh/cone_of_vision.h"
+#include "point.h"
+#include "pointf.h"
+#include "segment.h"
+#include "polygon.h"
+#include "path_finder.h"
+#include "cone_of_vision.h"
 
 #include <vector>
 #include <cmath>

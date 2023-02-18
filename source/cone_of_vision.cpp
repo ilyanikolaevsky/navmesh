@@ -1,7 +1,7 @@
-#include "navmesh/cone_of_vision.h"
-#include "navmesh/polygon.h"
-#include "navmesh/point.h"
-#include "navmesh/pointf.h"
+#include "cone_of_vision.h"
+#include "polygon.h"
+#include "point.h"
+#include "pointf.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
