@@ -1,4 +1,4 @@
-#include "Polygon.h"
+#include "polygon.h"
 
 #include <algorithm>
 

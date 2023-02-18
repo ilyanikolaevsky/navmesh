@@ -8,6 +8,7 @@
 #include "cone_of_vision.h"
 
 #include <vector>
+#include <cmath>
 
 using namespace NavMesh;
 
